@@ -1,0 +1,64 @@
+heat_template_version: 2013-05-23
+
+description: >
+        Create a SLURM cluster based on the parameters in params.yaml
+
+parameters:
+
+  key-name:
+    type: string
+    description: SSH key
+    default: stack01
+
+  net-id:
+    type: string
+    description: Network ID
+
+  head-image:
+    type: string
+    default: centos-7.1-1509-x86_64
+    description: Glance image for head instance
+
+  compute-image:
+    type: string
+    default: centos-7.1-1509-x86_64
+    description: Glance image for compute instance
+
+  host-prefix:
+    type: string
+    default: compute
+    description: Compute node hostname prefix
+
+  head-flavor:
+    type: string
+    default: m1.large
+    description: Head instance flavour
+
+  compute-flavor:
+    type: string
+    default: m1.medium
+    description: Compute instance flavour
+
+  nameserver:
+    type: string
+    description: DNS server for the cluster
+    default: 8.8.8.8
+
+  compute-count:
+    type: string
+    description: Number of compute node instances
+    default: 10
+
+  timeout:
+    type: number
+    description: Timeout for WaitCondition
+    default: 1200
+
+
+resources:
+  my_instance:
+    type: OS::Nova::Server
+    properties:
+            key-name: { get_param: key-name }
+            head-image: { get_param: head-image }
+            head-flavor: { get_param: head-flavor }        
