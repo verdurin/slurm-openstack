@@ -1,6 +1,5 @@
 parameters:
-  key_name: stack01
-  flavor: m1.large
-  compute_nodes: 10
-  net_id: 8a7701e6-1221-4373-b660-668cbd04e214
-  image: 06aa9a8d-8840-4256-965a-d164a313de2e
+  key-name: centos-vanloo-admin
+  compute-count: 10
+  net-id: 8a7701e6-1221-4373-b660-668cbd04e214
+  subnet-id: 940242c8-6160-4d95-9079-e3dff92bc603

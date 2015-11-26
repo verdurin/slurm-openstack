@@ -1,6 +1,6 @@
 heat_template_version: 2013-05-23
 
-description: >
+description: 
         Create a SLURM cluster based on the parameters in params.yaml
 
 parameters:
@@ -8,11 +8,15 @@ parameters:
   key-name:
     type: string
     description: SSH key
-    default: stack01
+    default: centos-vanloo-admin
 
   net-id:
     type: string
     description: Network ID
+
+  subnet-id:
+    type: string
+    description: Subnet ID
 
   head-image:
     type: string
@@ -56,14 +60,25 @@ parameters:
 
 
 resources:
-  my_instance:
+  instance1:
     type: OS::Nova::Server
     properties:
-      key_name: { get_param: key-name }
-      image: { get_param: head-image }
-      flavor: { get_param: head-flavor }
+      key_name: { get_param: 'key-name' }
+      image: { get_param: 'head-image' }
+      flavor: { get_param: 'head-flavor' }
       name:
         str_replace:
           template: "base%-head"
           params:
             base%: { get_param: 'OS::stack_name' }
+      networks:
+        - port: { get_resource: 'instance1-port' }
+      user_data_format: RAW
+
+  instance1-port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: 'net-id' }
+      fixed_ips:
+        - subnet_id: { get_param: 'subnet-id' }
+
