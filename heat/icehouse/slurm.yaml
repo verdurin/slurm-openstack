@@ -59,6 +59,11 @@ resources:
   my_instance:
     type: OS::Nova::Server
     properties:
-            key-name: { get_param: key-name }
-            head-image: { get_param: head-image }
-            head-flavor: { get_param: head-flavor }        
+      key_name: { get_param: key-name }
+      image: { get_param: head-image }
+      flavor: { get_param: head-flavor }
+      name:
+        str_replace:
+          template: "base%-head"
+          params:
+            base%: { get_param: "OS::stack_name' }
