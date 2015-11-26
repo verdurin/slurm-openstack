@@ -60,8 +60,69 @@ parameters:
 
 
 resources:
-  instance1:
-    type: OS::Nova::Server
+  head-wait-handle:
+    type: "AWS::CloudFormation::WaitConditionHandle"
+
+  head-wait-condition:
+    type: "AWS::CloudFormation::WaitCondition"
+    depends_on:
+      - head
+    properties:
+      Handle:
+        get_resource: head-wait-handle
+      Timeout: "2400"
+
+  keypair:
+    type: OS::Nova::KeyPair
+    properties:
+      name: local-root
+      save_private_key: true
+
+  ssh-icmp:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: ssh-icmp
+      description: SSH and Ping
+      rules:
+      - protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - protocol: icmp
+
+  nfs-server:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: nfs-server
+      description: NFS
+      rules:
+      - protocol: tcp
+        port_range_min: 111
+        port_range_max: 111
+      - protocol: tcp
+        port_range_min: 1110
+        port_range_max: 1110
+      - protocol: tcp
+        port_range_min: 2049
+        port_range_max: 2049
+      - protocol: tcp
+        port_range_min: 4045
+        port_range_max: 4045
+      - protocol: udp
+        port_range_min: 111
+        port_range_max: 111
+      - protocol: udp
+        port_range_min: 1110
+        port_range_max: 1110       
+      - protocol: udp
+        port_range_min: 2049
+        port_range_max: 2049
+      - protocol: udp
+        port_range_min: 4045
+        port_range_max: 4045
+
+
+ head:
+   type: OS::Nova::Server
     properties:
       key_name: { get_param: 'key-name' }
       image: { get_param: 'head-image' }
@@ -72,10 +133,14 @@ resources:
           params:
             base%: { get_param: 'OS::stack_name' }
       networks:
-        - port: { get_resource: 'instance1-port' }
+        - port: { get_resource: 'head-port' }
       user_data_format: RAW
+      security_groups:
+        - { get_resource: 'ssh-icmp' }
+        - { get_resource: 'nfs-server' }
+        - { get_resource: 'slurm' }
 
-  instance1-port:
+  head-port:
     type: OS::Neutron::Port
     properties:
       network_id: { get_param: 'net-id' }
