@@ -66,4 +66,4 @@ resources:
         str_replace:
           template: "base%-head"
           params:
-            base%: { get_param: "OS::stack_name' }
+            base%: { get_param: 'OS::stack_name' }
